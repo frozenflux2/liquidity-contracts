@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReceivedMsg",
+  "oneOf": [
+    {
+      "description": "Incoming Rewards for meant for distribution to Stakers and Owners",
+      "type": "object",
+      "required": [
+        "increase_reward_amount"
+      ],
+      "properties": {
+        "increase_reward_amount": {
+          "$ref": "#/definitions/IncreaseRewardAmountCommand"
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "definitions": {
+    "IncreaseRewardAmountCommand": {
+      "type": "object",
+      "required": [
+        "reward_from"
+      ],
+      "properties": {
+        "reward_from": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
