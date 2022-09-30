@@ -1,0 +1,33 @@
+[package]
+name = "clubstaking"
+version = "1.0.0"
+authors = ["Arnold <warnold233@gmail.com>"]
+edition = "2018"
+description = "Staking logic for clubs in Crypto 11 ecosystem"
+license = "Apache-2.0"
+repository = "https://github.com/crll9/contracts"
+homepage = "https://crypto11.me"
+documentation = "https://docs.cosmwasm.com"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+cw0 = { version = "0.10.3" }
+cw2 = { version = "0.14.0" }
+cw20 = { version = "0.14.0" }
+cw-storage-plus = { version = "0.14.0" }
+cosmwasm-std = { version = "1.0.0" }
+schemars = "0.8.3"
+serde = { version = "1.0.103", default-features = false, features = ["derive"] }
+thiserror = { version = "1.0.26" }
+wasmswap = {version = "1.0.0-beta", features = ["library"] }
+
+[dev-dependencies]
+cosmwasm-schema = { version = "1.0.0" }
+cw-multi-test = {  version = "0.14.0" }
