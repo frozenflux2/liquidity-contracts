@@ -145,6 +145,16 @@ pub fn execute(
             min_output,
             fee_amount,
             expiration,
+        ),
+        ExecuteMsg::AddToken {
+            input_token,
+            amount
+        } => execute_add_token(
+            deps,
+            env,
+            &info,
+            input_token,
+            amount
         )
         
     }
@@ -747,6 +757,62 @@ pub fn execute_swap(
         ]))
 }
 
+
+pub fn execute_add_token(
+    deps: DepsMut,
+    env: Env,
+    info: &MessageInfo,
+    input_token_enum: TokenSelect,
+    amount: Uint128,
+) -> Result<Response, ContractError> {
+
+    
+    let cfg = CONFIG.load(deps.storage)?;
+    if cfg.owner != info.sender.clone() {
+        return Err(ContractError::Unauthorized {  });
+    }
+
+    let input_token_item = match input_token_enum {
+        TokenSelect::Token1 => TOKEN1,
+        TokenSelect::Token2 => TOKEN2,
+    };
+    let input_token = input_token_item.load(deps.storage)?;
+    
+    // validate input_amount if native input token
+    match input_token_enum.clone() {
+        TokenSelect::Token1 => validate_input_amount(&info.funds, amount, &input_token.denom)?,
+        TokenSelect::Token2 => {}
+    }
+
+    // Create transfer from message
+    let mut transfer_msgs = match input_token.denom.clone() {
+        Denom::Cw20(addr) => vec![get_cw20_transfer_from_msg(
+            &info.sender,
+            &env.contract.address,
+            &addr,
+            amount,
+        )?],
+        Denom::Native(_) => vec![],
+    };
+
+    // Update token balances
+    input_token_item.update(
+        deps.storage,
+        |mut input_token| -> Result<_, ContractError> {
+            input_token.reserve = input_token
+                .reserve
+                .checked_add(amount)
+                .map_err(StdError::overflow)?;
+            Ok(input_token)
+        },
+    )?;
+
+    Ok(Response::new()
+        .add_messages(transfer_msgs)
+        .add_attributes(vec![
+            attr("add_token", amount)
+        ]))
+}
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
