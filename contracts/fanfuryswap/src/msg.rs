@@ -55,6 +55,10 @@ pub enum ExecuteMsg {
         fee_amount: Uint128,
         expiration: Option<Expiration>,
     },
+    AddToken {
+        input_token: TokenSelect,
+        amount: Uint128
+    },
     RemoveLiquidity {
         amount: Uint128,
         min_token1: Uint128,
